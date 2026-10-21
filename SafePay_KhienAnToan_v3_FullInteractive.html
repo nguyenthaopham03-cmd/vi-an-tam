@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SafePay - Khiên An Toàn BNPL (v3 - Tương tác chi tiết)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #0b1329;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: #1e293b;
+    }
+
+    /* Khung điện thoại giả lập iPhone */
+    .phone-container {
+      width: 390px;
+      height: 830px;
+      background: #ffffff;
+      border-radius: 46px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 10px #1e293b, 0 0 0 14px #334155;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Notch tai thỏ */
+    .notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 28px;
+      background: #1e293b;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+      z-index: 100;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      height: 44px;
+      padding: 10px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 90;
+      color: #0f172a;
+    }
+
+    .screen {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* ================= SCREEN 1: ONBOARDING ================= */
+    .onboarding-screen {
+      padding: 20px 24px 30px;
+      background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+      text-align: center;
+      justify-content: space-between;
+    }
+
+    .shield-mascot {
+      width: 130px;
+      height: 150px;
+      margin: 25px auto 10px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .shield-body {
+      width: 115px;
+      height: 135px;
+      background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+      clip-path: polygon(50% 0%, 100% 20%, 100% 75%, 50% 100%, 0% 75%, 0% 20%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 12px 25px rgba(37, 99, 235, 0.35);
+    }
+
+    .shield-face {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyes {
+      display: flex;
+      gap: 20px;
+    }
+
+    .eye {
+      width: 8px;
+      height: 13px;
+      background: #1e3a8a;
+      border-radius: 50%;
+    }
+
+    .smile {
+      width: 16px;
+      height: 8px;
+      border-bottom: 3px solid #1e3a8a;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .app-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1e40af;
+      margin-bottom: 4px;
+    }
+
+    .app-sub {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .slogan-box h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .slogan-box p {
+      font-size: 13.5px;
+      color: #64748b;
+      line-height: 1.5;
+      padding: 0 10px;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+      background: #1d4ed8;
+    }
+
+    /* ================= SCREEN 2: CONNECT ACCOUNTS (CÓ NÚT THÊM NỀN TẢNG KHÁC) ================= */
+    .connect-screen {
+      padding: 10px 20px 24px;
+      background: #f8fafc;
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #1e293b;
+      padding: 4px;
+    }
+
+    .screen-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .screen-desc {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .account-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      background: white;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .account-card:hover {
+      border-color: #3b82f6;
+      background: #f0f7ff;
+    }
+
+    .account-card.connected {
+      border-color: #10b981;
+      background: #f0fdf4;
+    }
+
+    .account-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .acc-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .acc-icon.spay { background: #fff1f0; color: #ee4d2d; border: 1px solid #ffd8d6; }
+    .acc-icon.momo { background: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; }
+    .acc-icon.kredivo { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .acc-icon.home { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .acc-icon.zalopay { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .acc-icon.custom { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+    .acc-text h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .acc-text p {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* Nút dấu cộng (+) Thêm nền tảng khác */
+    .add-platform-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      border: 2px dashed #93c5fd;
+      background: #eff6ff;
+      border-radius: 16px;
+      color: #2563eb;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 6px;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+
+    .add-platform-btn:hover {
+      background: #dbeafe;
+      border-color: #2563eb;
+    }
+
+    .add-platform-btn span.plus-icon {
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    /* Modal chọn nền tảng mới */
+    .platform-sheet-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 250;
+      display: none;
+      justify-content: flex-end;
+      flex-direction: column;
+      backdrop-filter: blur(2px);
+    }
+
+    .platform-sheet-overlay.active {
+      display: flex;
+    }
+
+    .platform-sheet {
+      background: white;
+      border-top-left-radius: 26px;
+      border-top-right-radius: 26px;
+      padding: 20px 20px 30px;
+      animation: slideUp 0.25s ease-out;
+      max-height: 85%;
+      overflow-y: auto;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: #cbd5e1;
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    /* ================= SCREEN 3: DASHBOARD KHIÊN AN TOÀN ================= */
+    .dashboard-screen {
+      background: #f8fafc;
+      padding-bottom: 70px;
+    }
+
+    .dash-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: white;
+      padding: 16px 20px 22px;
+      border-bottom-left-radius: 26px;
+      border-bottom-right-radius: 26px;
+    }
+
+    .dash-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .shield-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.18);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .shield-card {
+      background: white;
+      border-radius: 20px;
+      padding: 18px 16px;
+      color: #0f172a;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      margin-top: 6px;
+    }
+
+    .shield-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .shield-card-head h3 {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    /* NÚT TỔNG: TẮT / MỞ TẤT CẢ (MASTER TOGGLE) */
+    .master-switch-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-pill {
+      font-size: 11.5px;
+      background: #dcfce7;
+      color: #15803d;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      transition: all 0.25s;
+    }
+
+    .status-pill.disabled {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Switch Style iOS */
+    .switch-toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    input:checked + .slider {
+      background-color: #10b981;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* 3 Card lớp bảo vệ có thể bấm On/Off trực tiếp */
+    .layers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      text-align: center;
+    }
+
+    .layer-item {
+      background: #f1f5f9;
+      padding: 12px 6px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      user-select: none;
+      border: 1.5px solid transparent;
+    }
+
+    .layer-item:hover {
+      border-color: #93c5fd;
+    }
+
+    .layer-item:active {
+      transform: scale(0.96);
+    }
+
+    .layer-item.off {
+      opacity: 0.55;
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+
+    .layer-item .icon {
+      font-size: 22px;
+    }
+
+    .layer-item .name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+      line-height: 1.2;
+    }
+
+    .toggle-tag {
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-weight: 800;
+      background: #10b981;
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .layer-item.off .toggle-tag {
+      background: #94a3b8;
+    }
+
+    /* Card Thống kê chi tiêu */
+    .stats-card {
+      margin: 16px 20px 0;
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .stat-box h5 {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .stat-box h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .progress-bar-bg {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+      width: 28%;
+      height: 100%;
+      background: #10b981;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .linked-acc {
+      margin: 14px 20px 0;
+      background: white;
+      padding: 12px 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    /* Bottom Nav Bar */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding-bottom: 8px;
+      z-index: 80;
+    }
+
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .nav-btn.active {
+      color: #2563eb;
+    }
+
+    .nav-btn .icon {
+      font-size: 18px;
+    }
+
+    /* ================= SCREEN 4: SETTINGS (THANH KÉO & TẦN SUẤT) ================= */
+    .settings-screen {
+      padding: 10px 18px 80px;
+      background: #f8fafc;
+    }
+
+    .setting-group {
+      background: white;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .setting-group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .setting-group h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .setting-group p {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .slider-amount-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+
+    .slider-amount-display span {
+      font-size: 12px;
+      color: #1e40af;
+      font-weight: 600;
+    }
+
+    .slider-amount-display strong {
+      font-size: 18px;
+      color: #2563eb;
+      font-weight: 800;
+    }
+
+    .range-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: #e2e8f0;
+      outline: none;
+      -webkit-appearance: none;
+      accent-color: #2563eb;
+      margin-bottom: 14px;
+      cursor: pointer;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+    }
+
+    .threshold-options {
+      display: flex;
+      gap: 6px;
+    }
+
+    .th-chip {
+      flex: 1;
+      padding: 8px 2px;
+      text-align: center;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #334155;
+      background: white;
+      transition: all 0.2s;
+    }
+
+    .th-chip.selected {
+      border-color: #2563eb;
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .checkbox-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: #2563eb;
+    }
+
+    .freq-config-box {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+
+    .freq-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .stepper-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 3px 8px;
+    }
+
+    .step-btn {
+      background: none;
+      border: none;
+      font-size: 16px;
+      font-weight: 800;
+      color: #2563eb;
+      cursor: pointer;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-val {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    /* ================= SCREEN 6: LỊCH SỬ GIAO DỊCH (LỌC TƯƠNG TÁC TẤT CẢ / SPAY / MOMO...) ================= */
+    .history-screen {
+      background: #f8fafc;
+      padding: 10px 18px 80px;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .filter-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-tab {
+      padding: 7px 16px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #e2e8f0;
+      color: #475569;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .filter-tab.active {
+      background: #2563eb;
+      color: white;
+    }
+
+    .tx-item {
+      background: white;
+      padding: 14px 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tx-item:hover {
+      border-color: #93c5fd;
+      transform: translateY(-1px);
+    }
+
+    .tx-item:active {
+      transform: scale(0.98);
+    }
+
+    .tx-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tx-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .tx-logo.shopee { background: #fff1f0; color: #ee4d2d; }
+    .tx-logo.tiki { background: #e0f2fe; color: #0284c7; }
+    .tx-logo.lazada { background: #fdf2f8; color: #e11d48; }
+    .tx-logo.momo { background: #fdf2f8; color: #db2777; }
+    .tx-logo.kredivo { background: #eff6ff; color: #2563eb; }
+
+    .tx-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .tx-time {
+      font-size: 11.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .tx-right {
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tx-price {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .tx-arrow {
+      color: #94a3b8;
+      font-size: 16px;
+    }
+
+    .empty-tx {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    /* ================= SCREEN 7: TRANG CHI TIẾT ĐƠN HÀNG ================= */
+    .detail-screen {
+      background: #f8fafc;
+      padding: 10px 18px 80px;
+    }
+
+    .detail-card {
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    }
+
+    .detail-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed #e2e8f0;
+      margin-bottom: 14px;
+    }
+
+    .detail-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 10px;
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .product-row {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .product-thumb {
+      width: 70px;
+      height: 70px;
+      border-radius: 14px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+
+    .product-info h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .product-info p {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .detail-table-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      padding: 6px 0;
+      color: #475569;
+    }
+
+    .detail-table-row.total {
+      border-top: 1px solid #e2e8f0;
+      margin-top: 8px;
+      padding-top: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .safety-shield-box {
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .safety-shield-box .icon {
+      font-size: 24px;
+    }
+
+    .safety-shield-box h5 {
+      font-size: 13px;
+      font-weight: 800;
+      color: #1e40af;
+      margin-bottom: 2px;
+    }
+
+    .safety-shield-box p {
+      font-size: 11.5px;
+      color: #3b82f6;
+      line-height: 1.4;
+    }
+
+    /* ================= SCREEN 5: SHOPEE SIMULATION ================= */
+    .shopee-screen {
+      background: #f5f5f5;
+      position: relative;
+    }
+
+    .shopee-header {
+      background: white;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .shopee-search {
+      flex: 1;
+      margin: 0 10px;
+      background: #f1f1f1;
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 12px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .product-hero {
+      background: white;
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .product-img {
+      width: 200px;
+      height: 200px;
+      border-radius: 14px;
+      margin: 0 auto 10px;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+    }
+
+    .product-details {
+      background: white;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+
+    .product-price {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ee4d2d;
+      margin-bottom: 4px;
+    }
+
+    .spay-promo-tag {
+      display: inline-block;
+      font-size: 11px;
+      color: #ee4d2d;
+      background: #fff1f0;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .product-title {
+      font-size: 13.5px;
+      line-height: 1.4;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 8px;
+    }
+
+    .simulation-control {
+      background: #eff6ff;
+      border: 1px dashed #3b82f6;
+      padding: 12px;
+      border-radius: 14px;
+      margin: 10px 16px;
+      font-size: 11.5px;
+    }
+
+    .sim-buttons {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .btn-sim {
+      flex: 1;
+      padding: 7px 4px;
+      border-radius: 8px;
+      font-size: 10.5px;
+      font-weight: 700;
+      border: 1px solid #3b82f6;
+      background: white;
+      color: #2563eb;
+      cursor: pointer;
+    }
+
+    .btn-sim.active {
+      background: #2563eb;
+      color: white;
+    }
+
+    .shopee-bottom {
+      margin-top: auto;
+      background: white;
+      border-top: 1px solid #eee;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btn-buy-shopee {
+      background: #ee4d2d;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+    }
+
+    /* ================= SCREEN: POPUPS CẢNH BÁO ================= */
+    .popup-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 200;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      backdrop-filter: blur(3px);
+    }
+
+    .popup-overlay.active {
+      display: flex;
+    }
+
+    .popup-card {
+      background: white;
+      border-radius: 26px;
+      padding: 22px 18px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      animation: zoomIn 0.22s ease-out;
+    }
+
+    @keyframes zoomIn {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      font-size: 20px;
+      color: #94a3b8;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .popup-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .popup-icon.green-lock { background: #ecfdf5; color: #10b981; border: 2px solid #a7f3d0; }
+    .popup-icon.night-moon { background: #eff6ff; color: #3b82f6; border: 2px solid #bfdbfe; }
+    .popup-icon.freq-cart { background: #fffbeb; color: #f59e0b; border: 2px solid #fde68a; }
+
+    .popup-title {
+      font-size: 16.5px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .popup-sub {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .calc-table {
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      padding: 4px 0;
+      color: #475569;
+    }
+
+    .calc-row.highlight {
+      color: #ef4444;
+      font-weight: 700;
+      border-top: 1px dashed #cbd5e1;
+      margin-top: 4px;
+      padding-top: 6px;
+    }
+
+    .popup-btn {
+      background: #eff6ff;
+      color: #2563eb;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13.5px;
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .popup-footer-note {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* Helper Top Mode Bar (chuyển đổi nhanh các màn hình) */
+    .prototype-bar {
+      position: absolute;
+      top: 4px;
+      left: 14px;
+      right: 14px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(4px);
+      border-radius: 12px;
+      padding: 4px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 150;
+      color: #93c5fd;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .prototype-bar select {
+      background: #1e293b;
+      color: white;
+      border: 1px solid #475569;
+      font-size: 10px;
+      border-radius: 6px;
+      padding: 2px 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-container">
+    <!-- Tai thỏ và Status bar -->
+    <div class="notch"></div>
+    <div class="status-bar" id="statusBar">
+      <span id="clockTime">09:41</span>
+      <div style="display: flex; gap: 4px; align-items: center;">
+        <span>5G</span>
+        <span style="font-size: 11px;">100%</span>
+      </div>
+    </div>
+
+    <!-- Quick Switcher cho người kiểm thử / thuyết trình -->
+    <div class="prototype-bar">
+      <span>SafePay Pro v3</span>
+      <select id="quickNav" onchange="goToScreen(this.value)">
+        <option value="screen-dash">1. Khiên An Toàn (Dashboard)</option>
+        <option value="screen-connect">2. Kết nối BNPL (Nút + Thêm nền tảng)</option>
+        <option value="screen-history">3. Lịch sử giao dịch (Lọc nền tảng)</option>
+        <option value="screen-order-detail">4. Chi tiết đơn hàng cụ thể</option>
+        <option value="screen-settings">5. Thiết lập (Thanh kéo & Tần suất)</option>
+        <option value="screen-shopee">6. Giả lập mua sắm Shopee</option>
+      </select>
+    </div>
+
+    <!-- 1. MÀN HÌNH ONBOARDING -->
+    <div class="screen onboarding-screen" id="screen-onboarding">
+      <div style="margin-top: 30px;">
+        <div class="shield-mascot">
+          <div class="shield-body">
+            <div class="shield-face">
+              <div class="eyes">
+                <div class="eye"></div>
+                <div class="eye"></div>
+              </div>
+              <div class="smile"></div>
+            </div>
+          </div>
+        </div>
+        <div class="app-title">SafePay</div>
+        <div class="app-sub">Your BNPL safety companion</div>
+      </div>
+
+      <div class="slogan-box">
+        <h2>Chi tiêu thông minh<br>Bảo vệ tương lai tài chính</h2>
+        <p>SafePay giúp bạn kiểm soát chi tiêu BNPL và tránh mua sắm ngoài kế hoạch.</p>
+      </div>
+
+      <div>
+        <button class="btn-primary" onclick="goToScreen('screen-connect')">Bắt đầu</button>
+      </div>
+    </div>
+
+    <!-- 2. MÀN HÌNH KẾT NỐI BNPL (CÓ THÊM NÚT DẤU CỘNG + THÊM NỀN TẢNG KHÁC) -->
+    <div class="screen connect-screen" id="screen-connect">
+      <div style="margin-top: 26px;">
+        <div class="header-nav">
+          <button class="back-btn" onclick="goToScreen('screen-dash')">←</button>
+          <div class="screen-title">Kết nối tài khoản</div>
+        </div>
+        <div class="screen-desc">SafePay cần kết nối với tài khoản BNPL của bạn để theo dõi giao dịch và kích hoạt chế độ bảo vệ.</div>
+
+        <!-- Danh sách nền tảng hiện có -->
+        <div id="linkedPlatformsList">
+          <div class="account-card" onclick="connectPlatform('SPayLater')">
+            <div class="account-info">
+              <div class="acc-icon spay">S</div>
+              <div class="acc-text">
+                <h4>SPayLater</h4>
+                <p>Mua trước, trả sau Shopee</p>
+              </div>
+            </div>
+            <div style="color: #10b981; font-size: 12px; font-weight: 700;">● Đã kết nối</div>
+          </div>
+
+          <div class="account-card" onclick="connectPlatform('MoMo')">
+            <div class="account-info">
+              <div class="acc-icon momo">mo</div>
+              <div class="acc-text">
+                <h4>MoMo</h4>
+                <p>Ví điện tử & Ví trả sau</p>
+              </div>
+            </div>
+            <div style="color: #94a3b8; font-size: 18px;">›</div>
+          </div>
+        </div>
+
+        <!-- YÊU CẦU 1: NÚT DẤU CỘNG (+) Ở DƯỚI ĐỂ THÊM NỀN TẢNG KHÁC -->
+        <button class="add-platform-btn" onclick="openAddPlatformSheet()">
+          <span class="plus-icon">+</span>
+          <span>Thêm nền tảng BNPL khác</span>
+        </button>
+
+        <div style="background: white; border-radius: 16px; padding: 14px; font-size: 12px; color: #64748b; line-height: 1.5; border: 1px solid #e2e8f0;">
+          🔒 <strong>Bảo mật thông tin:</strong> SafePay chỉ đồng bộ danh sách đơn hàng đã mua để cảnh báo tài chính, cam kết không can thiệp vào tài khoản cá nhân.
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM SHEET: CHỌN NỀN TẢNG MỚI ĐỂ THÊM VÀO -->
+    <div class="platform-sheet-overlay" id="platformSheet" onclick="closeAddPlatformSheet(event)">
+      <div class="platform-sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <h3 style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Thêm tài khoản BNPL</h3>
+        <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Chọn nền tảng Mua trước Trả sau bạn đang dùng:</p>
+
+        <div class="account-card" onclick="addNewPlatform('Kredivo', 'kredivo', 'K', 'Mua trước trả sau Kredivo')">
+          <div class="account-info">
+            <div class="acc-icon kredivo">K</div>
+            <div class="acc-text">
+              <h4>Kredivo</h4>
+              <p>Hạn mức trả sau lên đến 50 triệu</p>
+            </div>
+          </div>
+          <span style="color: #2563eb; font-weight: 700; font-size: 13px;">+ Thêm</span>
+        </div>
+
+        <div class="account-card" onclick="addNewPlatform('Home PayLater', 'home', 'H', 'Mua trước trả sau Home Credit')">
+          <div class="account-info">
+            <div class="acc-icon home">H</div>
+            <div class="acc-text">
+              <h4>Home PayLater</h4>
+              <p>Trả sau Tiki, Lazada, Thế Giới Di Động</p>
+            </div>
+          </div>
+          <span style="color: #2563eb; font-weight: 700; font-size: 13px;">+ Thêm</span>
+        </div>
+
+        <div class="account-card" onclick="addNewPlatform('ZaloPay Tài Khoản Trả Sau', 'zalopay', 'Z', 'Ví trả sau ZaloPay')">
+          <div class="account-info">
+            <div class="acc-icon zalopay">Z</div>
+            <div class="acc-text">
+              <h4>ZaloPay Trả Sau</h4>
+              <p>Thanh toán hóa đơn & mua sắm trả sau</p>
+            </div>
+          </div>
+          <span style="color: #2563eb; font-weight: 700; font-size: 13px;">+ Thêm</span>
+        </div>
+
+        <button class="btn-primary" style="background: #e2e8f0; color: #475569; margin-top: 10px; padding: 12px;" onclick="closeAddPlatformSheet()">Hủy bỏ</button>
+      </div>
+    </div>
+
+    <!-- 3. MÀN HÌNH DASHBOARD KHIÊN AN TOÀN -->
+    <div class="screen active dashboard-screen" id="screen-dash">
+      <div class="dash-header" style="margin-top: 26px;">
+        <div class="dash-top">
+          <div>
+            <h2 style="font-size: 18px; font-weight: 800;">SafePay</h2>
+            <p style="font-size: 12px; opacity: 0.85;" id="shieldSubText">Bạn đang được bảo vệ</p>
+          </div>
+          <div class="shield-badge">🛡️ Khiên An Toàn</div>
+        </div>
+
+        <div class="shield-card">
+          <div class="shield-card-head">
+            <div>
+              <h3>Khiên An Toàn</h3>
+              <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Chạm vào từng lớp hoặc gạt nút để tắt/bật</div>
+            </div>
+            <!-- NÚT GẠT TỔNG -->
+            <div class="master-switch-wrap">
+              <span class="status-pill" id="activeLayersBadge">3/3 lớp bật</span>
+              <label class="switch-toggle" title="Tắt / Bật toàn bộ Khiên An Toàn">
+                <input type="checkbox" id="masterSwitch" checked onchange="toggleMasterShield(this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 3 NÚT LỚP BẢO VỆ CÓ THỂ BẤM TƯƠNG TÁC TẮT/MỞ RIÊNG LẺ -->
+          <div class="layers-grid">
+            <div class="layer-item" id="cardThreshold" onclick="toggleSingleLayer('threshold')">
+              <span class="icon">💰</span>
+              <span class="name">Ngưỡng chi tiêu</span>
+              <span class="toggle-tag" id="tagThreshold">ON</span>
+            </div>
+
+            <div class="layer-item" id="cardContext" onclick="toggleSingleLayer('context')">
+              <span class="icon">🌙</span>
+              <span class="name">Ngữ cảnh</span>
+              <span class="toggle-tag" id="tagContext">ON</span>
+            </div>
+
+            <div class="layer-item" id="cardFreq" onclick="toggleSingleLayer('freq')">
+              <span class="icon">⚡</span>
+              <span class="name">Tần suất</span>
+              <span class="toggle-tag" id="tagFreq">ON</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thống kê chi tiêu -->
+      <div class="stats-card">
+        <div class="stats-row">
+          <div class="stat-box">
+            <h5>Đã chi BNPL hôm nay</h5>
+            <h2>850.000₫</h2>
+          </div>
+          <div class="stat-box" style="text-align: right;">
+            <h5>Số giao dịch</h5>
+            <h2 id="dashTxCount">3 đơn</h2>
+          </div>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="dashProgressFill"></div>
+        </div>
+        <div class="progress-info">
+          <span>Ngưỡng an toàn: <strong id="dashThresholdDisplay" style="color:#0f172a;">3.000.000₫</strong></span>
+          <span style="color: #10b981;">Còn lại: <strong id="dashRemainingDisplay">2.150.000₫</strong></span>
+        </div>
+      </div>
+
+      <div class="linked-acc">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="acc-icon spay" style="width: 32px; height: 32px; font-size: 12px;">S</div>
+          <div>
+            <div style="font-size: 13px; font-weight: 700;">SPayLater (...1234)</div>
+            <div style="font-size: 11px; color: #10b981; font-weight: 600;">● Đã kết nối</div>
+          </div>
+        </div>
+        <button style="border: none; background: #eff6ff; color: #2563eb; font-weight: 700; font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer;" onclick="goToScreen('screen-shopee')">
+          Test Mua Hàng ➔
+        </button>
+      </div>
+
+      <!-- Nút xem lịch sử giao dịch -->
+      <div style="padding: 14px 20px;">
+        <button class="btn-primary" style="background: #475569; padding: 12px;" onclick="goToScreen('screen-history')">
+          Xem lịch sử mua
+        </button>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <button class="nav-btn active" onclick="goToScreen('screen-dash')">
+          <span class="icon">🏠</span>
+          Trang chủ
+        </button>
+        <button class="nav-btn" onclick="goToScreen('screen-history')">
+          <span class="icon">📊</span>
+          Chi tiêu
+        </button>
+        <button class="nav-btn" onclick="goToScreen('screen-settings')">
+          <span class="icon">⚙️</span>
+          Thiết lập
+        </button>
+        <button class="nav-btn" onclick="goToScreen('screen-connect')">
+          <span class="icon">👤</span>
+          Tài khoản
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. MÀN HÌNH THIẾT LẬP KHIÊN AN TOÀN -->
+    <div class="screen settings-screen" id="screen-settings">
+      <div style="margin-top: 26px;">
+        <div class="header-nav">
+          <button class="back-btn" onclick="goToScreen('screen-dash')">←</button>
+          <div class="screen-title">Thiết lập Khiên An Toàn</div>
+        </div>
+        <p class="screen-desc">Chọn cách bạn muốn SafePay bảo vệ quyết định mua sắm của mình.</p>
+
+        <!-- LỚP 1: NGƯỠNG AN TOÀN -->
+        <div class="setting-group">
+          <div class="setting-group-header">
+            <h4>1. Ngưỡng an toàn</h4>
+            <span style="font-size: 11px; color: #2563eb; font-weight: 700;">Tự do kéo chỉnh</span>
+          </div>
+          <p>Luôn giữ lại một khoản cho các khoản chi thiết yếu của bạn.</p>
+
+          <div class="slider-amount-display">
+            <span>Mức an toàn tối thiểu:</span>
+            <strong id="sliderValueText">3.000.000₫</strong>
+          </div>
+
+          <input type="range" class="range-slider" id="thresholdSlider" min="500000" max="10000000" step="100000" value="3000000" oninput="onSliderChange(this.value)">
+
+          <div style="font-size: 10px; color: #94a3b8; margin-bottom: 10px; display: flex; justify-content: space-between;">
+            <span>500k</span>
+            <span>5 triệu</span>
+            <span>10 triệu</span>
+          </div>
+
+          <div class="threshold-options">
+            <div class="th-chip" onclick="quickSelectThreshold(2000000)">2.000.000₫</div>
+            <div class="th-chip selected" id="chip3M" onclick="quickSelectThreshold(3000000)">3.000.000₫</div>
+            <div class="th-chip" onclick="quickSelectThreshold(5000000)">5.000.000₫</div>
+          </div>
+        </div>
+
+        <!-- LỚP 2: NGỮ CẢNH -->
+        <div class="setting-group">
+          <h4>2. Ngữ cảnh</h4>
+          <p>Bảo vệ vào những thời điểm dễ chi tiêu bốc đồng, mất kiểm soát.</p>
+          <label class="checkbox-row">
+            <span>🌙 Đêm muộn (23:00 - 06:00)</span>
+            <input type="checkbox" id="checkNight" checked>
+          </label>
+          <label class="checkbox-row">
+            <span>🔥 Mùa Sale lớn (11.11, Payday)</span>
+            <input type="checkbox" id="checkSale" checked>
+          </label>
+        </div>
+
+        <!-- LỚP 3: TẦN SUẤT -->
+        <div class="setting-group">
+          <h4>3. Tần suất</h4>
+          <p>Phát hiện khi bạn mua sắm dồn dập nhiều đơn cùng lúc.</p>
+          
+          <label class="checkbox-row">
+            <span>⚡ Tự khóa tạm thời 12 giờ</span>
+            <input type="checkbox" id="checkFreq" checked>
+          </label>
+
+          <div class="freq-config-box">
+            <div class="freq-row">
+              <span>Khóa khi mua liên tiếp vượt quá:</span>
+              <div class="stepper-control">
+                <button class="step-btn" onclick="adjustMaxOrders(-1)">−</button>
+                <span class="step-val" id="maxOrdersVal">3</span>
+                <button class="step-btn" onclick="adjustMaxOrders(1)">+</button>
+              </div>
+            </div>
+            <div style="font-size: 11px; color: #64748b; line-height: 1.4;">
+              💡 <em>Nếu bạn đặt từ <strong><span id="hintOrdersText">3</span> đơn</strong> trong vòng <strong>2 giờ</strong>, SPayLater sẽ tạm khóa 12h để bạn cân nhắc.</em>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="saveSettings()">Lưu thiết lập</button>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <button class="nav-btn" onclick="goToScreen('screen-dash')">
+          <span class="icon">🏠</span>
+          Trang chủ
+        </button>
+        <button class="nav-btn" onclick="goToScreen('screen-history')">
+          <span class="icon">📊</span>
+          Chi tiêu
+        </button>
+        <button class="nav-btn active" onclick="goToScreen('screen-settings')">
+          <span class="icon">⚙️</span>
+          Thiết lập
+        </button>
+        <button class="nav-btn" onclick="goToScreen('screen-connect')">
+          <span class="icon">👤</span>
+          Tài khoản
+        </button>
+      </div>
+    </div>
+
+    <!-- 5. MÀN HÌNH LỊCH SỬ GIAO DỊCH (YÊU CẦU 2: BẤM SPAY LỌC ĐƠN SPAY, BẤM MOMO LỌC MOMO...) -->
+    <div class="screen history-screen" id="screen-history">
+      <div style="margin-top: 26px;">
+        <div class="header-nav">
+          <button class="back-btn" onclick="goToScreen('screen-dash')">←</button>
+          <div class="screen-title">Lịch sử giao dịch BNPL</div>
+        </div>
+
+        <!-- CÁC TAB LỌC TƯƠNG TÁC ĐẦY ĐỦ -->
+        <div class="filter-tabs" id="historyTabs">
+          <div class="filter-tab active" onclick="filterTransactions('all', this)">Tất cả</div>
+          <div class="filter-tab" onclick="filterTransactions('SPayLater', this)">SPayLater</div>
+          <div class="filter-tab" onclick="filterTransactions('MoMo', this)">MoMo</div>
+          <div class="filter-tab" onclick="filterTransactions('Kredivo', this)">Kredivo</div>
+        </div>
+
+        <!-- DANH SÁCH ĐƠN HÀNG CÓ THỂ BẤM VÀO XEM CHI TIẾT (YÊU CẦU 3) -->
+        <div id="transactionListContainer">
+          <!-- Sẽ render bằng JS bên dưới -->
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <button class="nav-btn" onclick="goToScreen('screen-dash')">
+          <span class="icon">🏠</span>
+          Trang chủ
+        </button>
+        <button class="nav-btn active" onclick="goToScreen('screen-history')">
+          <span class="icon">📊</span>
+          Chi tiêu
+        </button>
+        <button class="nav-btn" onclick="goToScreen('screen-settings')">
+          <span class="icon">⚙️</span>
+          Thiết lập
+        </button>
+        <button class="nav-btn" onclick="goToScreen('screen-connect')">
+          <span class="icon">👤</span>
+          Tài khoản
+        </button>
+      </div>
+    </div>
+
+    <!-- 6. MÀN HÌNH CHI TIẾT ĐƠN HÀNG (YÊU CẦU 3: BẤM VÀO ĐƠN SẼ HIỆN RÕ MUA CÁI GÌ) -->
+    <div class="screen detail-screen" id="screen-order-detail">
+      <div style="margin-top: 26px;">
+        <div class="header-nav">
+          <button class="back-btn" onclick="goToScreen('screen-history')">←</button>
+          <div class="screen-title">Chi tiết đơn hàng</div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-status-bar">
+            <div>
+              <span style="font-size: 11px; color: #64748b;">Mã đơn hàng</span>
+              <h4 style="font-size: 13px; font-weight: 800; color: #0f172a;" id="detOrderCode">#SPX-982341</h4>
+            </div>
+            <span class="detail-badge">Thanh toán BNPL thành công</span>
+          </div>
+
+          <div class="product-row">
+            <div class="product-thumb" id="detProductThumb">🧴</div>
+            <div class="product-info">
+              <h4 id="detProductName">Mỹ phẩm La Roche-Posay</h4>
+              <p id="detProductSub">Số lượng: 1 • Phân loại: 30ml</p>
+              <div style="color: #ee4d2d; font-weight: 800; font-size: 14px; margin-top: 4px;" id="detProductPrice">120.000₫</div>
+            </div>
+          </div>
+
+          <div style="border-top: 1px dashed #e2e8f0; padding-top: 10px; margin-top: 6px;">
+            <div class="detail-table-row">
+              <span>Nền tảng thanh toán:</span>
+              <strong id="detPlatform">Shopee (SPayLater)</strong>
+            </div>
+            <div class="detail-table-row">
+              <span>Thời gian mua:</span>
+              <span id="detOrderTime">Hôm nay, 16:20</span>
+            </div>
+            <div class="detail-table-row">
+              <span>Kỳ hạn trả sau:</span>
+              <span>1 kỳ (Đến hạn 25/11)</span>
+            </div>
+            <div class="detail-table-row">
+              <span>Phí dịch vụ BNPL:</span>
+              <span style="color: #10b981; font-weight: 600;">Miễn phí (Ưu đãi 0%)</span>
+            </div>
+            <div class="detail-table-row total">
+              <span>Tổng tiền thanh toán:</span>
+              <span style="color: #ee4d2d;" id="detOrderTotal">120.000₫</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Đánh giá Khiên An Toàn cho đơn này -->
+        <div class="safety-shield-box">
+          <div class="icon">🛡️</div>
+          <div>
+            <h5>Đánh giá Khiên An Toàn:</h5>
+            <p id="detSafetyNote">Đơn hàng này nằm trong phạm vi ngân sách an toàn, không phát hiện rủi ro chi tiêu bốc đồng.</p>
+          </div>
+        </div>
+
+        <button class="btn-primary" style="background: #e2e8f0; color: #334155;" onclick="goToScreen('screen-history')">
+          ← Quay lại danh sách đơn
+        </button>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <button class="nav-btn" onclick="goToScreen('screen-dash')">
+          <span class="icon">🏠</span>
+          Trang chủ
+        </button>
+        <button class="nav-btn active" onclick="goToScreen('screen-history')">
+          <span class="icon">📊</span>
+          Chi tiêu
+        </button>
+        <button class="nav-btn" onclick="goToScreen('screen-settings')">
+          <span class="icon">⚙️</span>
+          Thiết lập
+        </button>
+        <button class="nav-btn" onclick="goToScreen('screen-connect')">
+          <span class="icon">👤</span>
+          Tài khoản
+        </button>
+      </div>
+    </div>
+
+    <!-- 7. MÀN HÌNH SHOPEE SIMULATION (MÔ PHỎNG MUA SẮM) -->
+    <div class="screen shopee-screen" id="screen-shopee">
+      <div class="shopee-header" style="margin-top: 26px;">
+        <button class="back-btn" onclick="goToScreen('screen-dash')">←</button>
+        <div class="shopee-search">🔍 Mỹ phẩm La Roche-Posay / Paula's Choice</div>
+        <div style="font-size: 16px;">🛒</div>
+      </div>
+
+      <div class="simulation-control">
+        <strong>🧪 KỊCH BẢN THỬ NGHIỆM KHIÊN:</strong>
+        <p style="color: #64748b; margin-top: 2px;">Bấm chọn kịch bản để thử nghiệm độ nhạy của 3 lớp bảo vệ:</p>
+        <div class="sim-buttons">
+          <button class="btn-sim active" id="btnScenTh" onclick="setProductScenario('threshold')">1. Vượt ngưỡng</button>
+          <button class="btn-sim" id="btnScenNight" onclick="setProductScenario('night')">2. Đêm muộn</button>
+          <button class="btn-sim" id="btnScenFreq" onclick="setProductScenario('freq')">3. Tần suất cao</button>
+        </div>
+      </div>
+
+      <div class="product-hero">
+        <div class="product-img" id="productImage">🧴</div>
+      </div>
+
+      <div class="product-details">
+        <div class="spay-promo-tag" id="spayTag">SPayLater 0% • Trả sau tiện lợi</div>
+        <div class="product-price" id="productPrice">1.063.350₫</div>
+        <div class="product-title" id="productTitle">
+          Dưỡng chất giảm thâm nám và dưỡng sáng toàn diện La Roche-Posay Mela B3 serum 30ml
+        </div>
+        <div style="font-size: 12px; color: #10b981; font-weight: 600;">
+          Miễn phí vận chuyển toàn quốc
+        </div>
+      </div>
+
+      <div class="shopee-bottom">
+        <div style="font-size: 12px; color: #64748b;">
+          <div>Tổng thanh toán SPayLater</div>
+          <div style="font-weight: 800; color: #ee4d2d; font-size: 15px;" id="bottomPrice">1.063.350₫</div>
+        </div>
+        <button class="btn-buy-shopee" onclick="triggerCheckout()">
+          Mua với SPayLater
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= CÁC POPUP CẢNH BÁO KHI BỊ CHẶN THANH TOÁN ================= -->
+
+    <!-- POPUP 1: CHẶN VÌ VƯỢT NGƯỠNG CHI TIÊU -->
+    <div class="popup-overlay" id="popup-threshold">
+      <div class="popup-card">
+        <button class="popup-close" onclick="closePopup()">✕</button>
+        <div class="popup-icon green-lock">🔒</div>
+        <div class="popup-title">Khiên An Toàn đã bảo vệ bạn</div>
+        <div class="popup-sub">
+          Giao dịch này sẽ khiến số tiền còn lại thấp hơn mức sinh hoạt tối thiểu bạn đã đặt.
+        </div>
+        <div class="calc-table">
+          <div class="calc-row">
+            <span>Số dư tài khoản:</span>
+            <strong>3.200.000₫</strong>
+          </div>
+          <div class="calc-row">
+            <span>Mức an toàn đã cài:</span>
+            <strong id="popupSetThreshold">3.000.000₫</strong>
+          </div>
+          <div class="calc-row highlight">
+            <span>Sau đơn hàng này:</span>
+            <strong id="popupRemainingAfter">2.136.650₫ (Dưới ngưỡng)</strong>
+          </div>
+        </div>
+        <button class="popup-btn" onclick="closePopup()">Quay lại mua sắm</button>
+        <div class="popup-footer-note">SPayLater sẽ được mở lại khi số dư của bạn trở lại trên mức bảo vệ.</div>
+      </div>
+    </div>
+
+    <!-- POPUP 2: CHẶN THEO NGỮ CẢNH (ĐÊM MUỘN) -->
+    <div class="popup-overlay" id="popup-night">
+      <div class="popup-card">
+        <button class="popup-close" onclick="closePopup()">✕</button>
+        <div class="popup-icon night-moon">🌙</div>
+        <div class="popup-title">Trả Sau đang được tạm ẩn</div>
+        <div class="popup-sub">
+          Khiên An Toàn đang bật chế độ <strong>Bảo vệ ban đêm</strong> để tránh mua sắm bốc đồng ngoài ý muốn.
+        </div>
+        <div style="background: #eff6ff; border-radius: 12px; padding: 12px; margin-bottom: 16px; font-size: 13px; color: #1e40af; font-weight: 600;">
+          🕒 SPayLater sẽ khả dụng trở lại lúc: <strong>06:00 sáng mai</strong>
+        </div>
+        <button class="popup-btn" onclick="closePopup()">Quay lại mua sắm</button>
+        <div class="popup-footer-note">Ngủ một giấc ngon lành và quyết định lại vào sáng mai bạn nhé!</div>
+      </div>
+    </div>
+
+    <!-- POPUP 3: CHẶN THEO TẦN SUẤT (MUA QUÁ NHIỀU ĐƠN LIÊN TIẾP) -->
+    <div class="popup-overlay" id="popup-freq">
+      <div class="popup-card">
+        <button class="popup-close" onclick="closePopup()">✕</button>
+        <div class="popup-icon freq-cart">🛒</div>
+        <div class="popup-title">Khiên An Toàn đang tạm khóa</div>
+        <div class="popup-sub" id="popupFreqSubText">
+          Bạn đã thực hiện 3 giao dịch Trả Sau liên tiếp trong thời gian ngắn (vượt giới hạn đã cài).
+        </div>
+        <div style="background: #fffbeb; border-radius: 12px; padding: 12px; margin-bottom: 16px; font-size: 13px; color: #b45309; font-weight: 600;">
+          ⏳ Để bạn có thời gian cân nhắc các khoản chi, SPayLater tạm khóa trong <strong>12 giờ</strong>.
+          <div style="font-size: 11px; margin-top: 4px; color: #92400e;">Mở lại lúc: 20:30 hôm nay</div>
+        </div>
+        <button class="popup-btn" onclick="closePopup(); goToScreen('screen-history')">Xem lịch sử chi tiêu</button>
+        <div class="popup-footer-note">Bình tĩnh kiểm tra danh sách đơn trước khi mua tiếp nhé.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ================= DỮ LIỆU ĐƠN HÀNG MẪU (CHI TIẾT ĐẦY ĐỦ CÁC NỀN TẢNG) =================
+    const transactionsData = [
+      {
+        id: "tx-1",
+        code: "SPX-982341",
+        platform: "SPayLater",
+        appName: "Shopee",
+        logoClass: "shopee",
+        logoText: "S",
+        name: "Shopee - Serum La Roche-Posay B3",
+        sub: "Số lượng: 1 • Phân loại: 30ml",
+        time: "Hôm nay 16:20",
+        price: 120000,
+        thumb: "🧴",
+        safetyNote: "Đơn hàng nằm trong ngưỡng an toàn, chi tiêu đúng kế hoạch."
+      },
+      {
+        id: "tx-2",
+        code: "TK-410928",
+        platform: "SPayLater",
+        appName: "Tiki",
+        logoClass: "tiki",
+        logoText: "Tiki",
+        name: "Tiki - Sách Tư Duy Tài Chính Khôn Ngoan",
+        sub: "Số lượng: 2 cuốn • Bìa cứng",
+        time: "Hôm nay 12:14",
+        price: 250000,
+        thumb: "📚",
+        safetyNote: "Khoản chi phục vụ học tập, không vi phạm quy tắc Khiên An Toàn."
+      },
+      {
+        id: "tx-3",
+        code: "LZD-772109",
+        platform: "SPayLater",
+        appName: "Lazada",
+        logoClass: "lazada",
+        logoText: "Laz",
+        name: "Lazada - Bộ Hộp Cơm Giữ Nhiệt Văn Phòng",
+        sub: "Số lượng: 1 bộ • Màu Inox Xám",
+        time: "Hôm nay 10:32",
+        price: 480000,
+        thumb: "🍱",
+        safetyNote: "Giao dịch đạt 16% ngân sách chi tiêu trong ngày."
+      },
+      {
+        id: "tx-4",
+        code: "SPX-102934",
+        platform: "SPayLater",
+        appName: "Shopee",
+        logoClass: "shopee",
+        logoText: "S",
+        name: "Shopee - Áo Thun Local Brand Unisex",
+        sub: "Số lượng: 1 • Size L • Trắng",
+        time: "Hôm qua 21:05",
+        price: 200000,
+        thumb: "👕",
+        safetyNote: "Đơn hàng mua lúc 21h, trước khung giờ bảo vệ đêm muộn."
+      },
+      {
+        id: "tx-5",
+        code: "MM-881920",
+        platform: "MoMo",
+        appName: "MoMo Trả Sau",
+        logoClass: "momo",
+        logoText: "mo",
+        name: "MoMo - Thanh toán Hóa đơn Điện Nước",
+        sub: "Kỳ hóa đơn tháng 10/2026",
+        time: "Hôm qua 18:40",
+        price: 350000,
+        thumb: "💡",
+        safetyNote: "Chi phí sinh hoạt thiết yếu được ưu tiên không giới hạn."
+      },
+      {
+        id: "tx-6",
+        code: "MM-551203",
+        platform: "MoMo",
+        appName: "MoMo Trả Sau",
+        logoClass: "momo",
+        logoText: "mo",
+        name: "MoMo - Highlands Coffee & Bánh Mì",
+        sub: "2 Ly Phin Sữa Tươi Bánh Flan",
+        time: "14/10/2026 15:10",
+        price: 95000,
+        thumb: "☕",
+        safetyNote: "Khoản chi tiêu ăn uống hàng ngày ở mức hợp lý."
+      },
+      {
+        id: "tx-7",
+        code: "KRD-334112",
+        platform: "Kredivo",
+        appName: "Kredivo",
+        logoClass: "kredivo",
+        logoText: "K",
+        name: "Kredivo - Tai nghe Bluetooth True Wireless",
+        sub: "Màu Đen Nhám • Chống ồn chủ động",
+        time: "13/10/2026 09:20",
+        price: 890000,
+        thumb: "🎧",
+        safetyNote: "Giao dịch trả góp 3 tháng qua Kredivo 0% lãi suất."
+      }
+    ];
+
+    // Trạng thái chung của app
+    let currentThreshold = 3000000;
+    let maxAllowedOrders = 3;
+    let currentScenario = 'threshold';
+    let currentFilter = 'all';
+
+    let layersState = {
+      threshold: true,
+      context: true,
+      freq: true
+    };
+
+    function formatVND(val) {
+      return Number(val).toLocaleString('vi-VN') + '₫';
+    }
+
+    // ================= ĐIỀU HƯỚNG MÀN HÌNH =================
+    function goToScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.classList.add('active');
+        document.getElementById('quickNav').value = screenId;
+      }
+      closePopup();
+      closeAddPlatformSheet();
+
+      // Cập nhật giờ hiển thị
+      const clock = document.getElementById('clockTime');
+      if (screenId === 'screen-shopee' && currentScenario === 'night') {
+        clock.innerText = '23:30';
+      } else if (screenId === 'screen-shopee' && currentScenario === 'freq') {
+        clock.innerText = '18:28';
+      } else {
+        clock.innerText = '09:41';
+      }
+
+      if (screenId === 'screen-history') {
+        renderTransactions();
+      }
+    }
+
+    // ================= YÊU CẦU 1: THÊM NỀN TẢNG KHÁC (DẤU CỘNG) =================
+    function openAddPlatformSheet() {
+      document.getElementById('platformSheet').classList.add('active');
+    }
+
+    function closeAddPlatformSheet(e) {
+      document.getElementById('platformSheet').classList.remove('active');
+    }
+
+    function addNewPlatform(name, className, letter, desc) {
+      closeAddPlatformSheet();
+
+      // Thêm vào danh sách UI màn hình kết nối
+      const list = document.getElementById('linkedPlatformsList');
+      const newCard = document.createElement('div');
+      newCard.className = 'account-card';
+      newCard.onclick = function() { connectPlatform(name); };
+      newCard.innerHTML = `
+        <div class="account-info">
+          <div class="acc-icon ${className}">${letter}</div>
+          <div class="acc-text">
+            <h4>${name}</h4>
+            <p>${desc}</p>
+          </div>
+        </div>
+        <div style="color: #10b981; font-size: 12px; font-weight: 700;">● Đã thêm</div>
+      `;
+      list.appendChild(newCard);
+
+      // Thêm tab lọc mới vào màn hình Lịch sử giao dịch (nếu chưa có)
+      const tabs = document.getElementById('historyTabs');
+      const tabExists = Array.from(tabs.children).some(t => t.innerText.trim() === name);
+      if (!tabExists) {
+        const newTab = document.createElement('div');
+        newTab.className = 'filter-tab';
+        newTab.innerText = name;
+        newTab.onclick = function() { filterTransactions(name, this); };
+        tabs.appendChild(newTab);
+      }
+
+      alert(`Đã liên kết thành công nền tảng [${name}] vào Khiên An Toàn SafePay!`);
+    }
+
+    function connectPlatform(name) {
+      alert(`Tài khoản ${name} đang ở trạng thái hoạt động và được bảo vệ.`);
+    }
+
+    // ================= YÊU CẦU 2 & 3: LỌC NỀN TẢNG & XEM CHI TIẾT ĐƠN HÀNG =================
+    function filterTransactions(filterKey, tabEl) {
+      currentFilter = filterKey;
+      document.querySelectorAll('#historyTabs .filter-tab').forEach(t => t.classList.remove('active'));
+      if (tabEl) tabEl.classList.add('active');
+      renderTransactions();
+    }
+
+    function renderTransactions() {
+      const container = document.getElementById('transactionListContainer');
+      container.innerHTML = '';
+
+      let filtered = transactionsData;
+      if (currentFilter !== 'all') {
+        filtered = transactionsData.filter(t => t.platform.toLowerCase() === currentFilter.toLowerCase() || t.appName.toLowerCase().includes(currentFilter.toLowerCase()));
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-tx">
+            <div style="font-size: 32px; margin-bottom: 8px;">🛒</div>
+            Chưa có giao dịch trả sau nào từ <strong>${currentFilter}</strong>.
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'tx-item';
+        div.onclick = function() { openOrderDetail(item.id); };
+        div.innerHTML = `
+          <div class="tx-left">
+            <div class="tx-logo ${item.logoClass}">${item.logoText}</div>
+            <div>
+              <div class="tx-name">${item.name}</div>
+              <div class="tx-time">${item.time} • ${item.platform}</div>
+            </div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-price">${formatVND(item.price)}</div>
+            <div class="tx-arrow">›</div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Mở trang chi tiết đơn hàng (Yêu cầu 3)
+    function openOrderDetail(txId) {
+      const item = transactionsData.find(t => t.id === txId);
+      if (!item) return;
+
+      document.getElementById('detOrderCode').innerText = `#${item.code}`;
+      document.getElementById('detProductThumb').innerText = item.thumb;
+      document.getElementById('detProductName').innerText = item.name;
+      document.getElementById('detProductSub').innerText = item.sub;
+      document.getElementById('detProductPrice').innerText = formatVND(item.price);
+      document.getElementById('detPlatform').innerText = `${item.appName} (${item.platform})`;
+      document.getElementById('detOrderTime').innerText = item.time;
+      document.getElementById('detOrderTotal').innerText = formatVND(item.price);
+      document.getElementById('detSafetyNote').innerText = item.safetyNote;
+
+      goToScreen('screen-order-detail');
+    }
+
+    // ================= TƯƠNG TÁC TẮT/MỞ DASHBOARD =================
+    function updateShieldUI() {
+      const activeCount = Object.values(layersState).filter(Boolean).length;
+      const badge = document.getElementById('activeLayersBadge');
+      const masterSwitch = document.getElementById('masterSwitch');
+      const subText = document.getElementById('shieldSubText');
+
+      badge.innerText = `${activeCount}/3 lớp bật`;
+      if (activeCount === 0) {
+        badge.classList.add('disabled');
+        badge.innerText = 'Đã tắt bảo vệ';
+        masterSwitch.checked = false;
+        subText.innerText = '⚠️ Bạn đang không bật bảo vệ';
+      } else {
+        badge.classList.remove('disabled');
+        masterSwitch.checked = (activeCount === 3);
+        subText.innerText = 'Bạn đang được bảo vệ';
+      }
+
+      const cardTh = document.getElementById('cardThreshold');
+      const tagTh = document.getElementById('tagThreshold');
+      if (layersState.threshold) {
+        cardTh.classList.remove('off');
+        tagTh.innerText = 'ON';
+      } else {
+        cardTh.classList.add('off');
+        tagTh.innerText = 'OFF';
+      }
+
+      const cardCtx = document.getElementById('cardContext');
+      const tagCtx = document.getElementById('tagContext');
+      if (layersState.context) {
+        cardCtx.classList.remove('off');
+        tagCtx.innerText = 'ON';
+      } else {
+        cardCtx.classList.add('off');
+        tagCtx.innerText = 'OFF';
+      }
+
+      const cardFr = document.getElementById('cardFreq');
+      const tagFr = document.getElementById('tagFreq');
+      if (layersState.freq) {
+        cardFr.classList.remove('off');
+        tagFr.innerText = 'ON';
+      } else {
+        cardFr.classList.add('off');
+        tagFr.innerText = 'OFF';
+      }
+    }
+
+    function toggleMasterShield(isOn) {
+      layersState.threshold = isOn;
+      layersState.context = isOn;
+      layersState.freq = isOn;
+      updateShieldUI();
+    }
+
+    function toggleSingleLayer(layerKey) {
+      layersState[layerKey] = !layersState[layerKey];
+      updateShieldUI();
+    }
+
+    // ================= THANH KÉO (SLIDER) & CÀI ĐẶT SỐ TIỀN =================
+    function onSliderChange(val) {
+      currentThreshold = Number(val);
+      document.getElementById('sliderValueText').innerText = formatVND(val);
+
+      document.querySelectorAll('.th-chip').forEach(c => c.classList.remove('selected'));
+      if (val == 2000000) document.querySelectorAll('.th-chip')[0].classList.add('selected');
+      if (val == 3000000) document.querySelectorAll('.th-chip')[1].classList.add('selected');
+      if (val == 5000000) document.querySelectorAll('.th-chip')[2].classList.add('selected');
+
+      updateDashboardAmounts();
+    }
+
+    function quickSelectThreshold(val) {
+      currentThreshold = val;
+      document.getElementById('thresholdSlider').value = val;
+      document.getElementById('sliderValueText').innerText = formatVND(val);
+
+      document.querySelectorAll('.th-chip').forEach(c => c.classList.remove('selected'));
+      event.target.classList.add('selected');
+
+      updateDashboardAmounts();
+    }
+
+    function updateDashboardAmounts() {
+      document.getElementById('dashThresholdDisplay').innerText = formatVND(currentThreshold);
+      const spent = 850000;
+      const remaining = Math.max(0, currentThreshold - spent);
+      document.getElementById('dashRemainingDisplay').innerText = formatVND(remaining);
+
+      const percent = Math.min(100, Math.round((spent / currentThreshold) * 100));
+      document.getElementById('dashProgressFill').style.width = percent + '%';
+
+      document.getElementById('popupSetThreshold').innerText = formatVND(currentThreshold);
+      const totalBalance = 3200000;
+      const itemPrice = 1063350;
+      const afterTx = totalBalance - itemPrice;
+      document.getElementById('popupRemainingAfter').innerText = `${formatVND(afterTx)} (Dưới ngưỡng cài ${formatVND(currentThreshold)})`;
+    }
+
+    // ================= THIẾT LẬP TẦN SUẤT =================
+    function adjustMaxOrders(delta) {
+      maxAllowedOrders = Math.max(1, Math.min(10, maxAllowedOrders + delta));
+      document.getElementById('maxOrdersVal').innerText = maxAllowedOrders;
+      document.getElementById('hintOrdersText').innerText = maxAllowedOrders;
+      document.getElementById('popupFreqSubText').innerText = `Bạn đã đặt ${maxAllowedOrders} giao dịch liên tiếp trong thời gian ngắn (vượt giới hạn ${maxAllowedOrders} đơn đã cài).`;
+    }
+
+    function saveSettings() {
+      updateDashboardAmounts();
+      alert(`Đã lưu thiết lập Khiên An Toàn!
+- Ngưỡng an toàn: ${formatVND(currentThreshold)}
+- Giới hạn tần suất: ${maxAllowedOrders} đơn/lần`);
+      goToScreen('screen-dash');
+    }
+
+    // ================= MÔ PHỎNG SHOPEE & POPUP =================
+    function setProductScenario(type) {
+      currentScenario = type;
+      document.querySelectorAll('.btn-sim').forEach(b => b.classList.remove('active'));
+
+      const clock = document.getElementById('clockTime');
+      const img = document.getElementById('productImage');
+      const title = document.getElementById('productTitle');
+      const price = document.getElementById('productPrice');
+      const bPrice = document.getElementById('bottomPrice');
+
+      if (type === 'threshold') {
+        document.getElementById('btnScenTh').classList.add('active');
+        clock.innerText = '19:39';
+        img.innerText = '🧴';
+        title.innerText = 'Dưỡng chất giảm thâm nám và dưỡng sáng toàn diện La Roche-Posay Mela B3 serum 30ml';
+        price.innerText = '1.063.350₫';
+        bPrice.innerText = '1.063.350₫';
+      } else if (type === 'night') {
+        document.getElementById('btnScenNight').classList.add('active');
+        clock.innerText = '23:30';
+        img.innerText = '✨';
+        title.innerText = "Tinh chất thu nhỏ lỗ chân lông & làm sáng da Paula's Choice 10% Niacinamide Booster 20ml";
+        price.innerText = '1.471.490₫';
+        bPrice.innerText = '1.471.490₫';
+      } else if (type === 'freq') {
+        document.getElementById('btnScenFreq').classList.add('active');
+        clock.innerText = '18:28';
+        img.innerText = '👁️';
+        title.innerText = 'LENS 1 NGÀY cận LENS XOẮN kính áp tròng tự nhiên đi học đi chơi';
+        price.innerText = '139.680₫';
+        bPrice.innerText = '139.680₫';
+      }
+    }
+
+    function triggerCheckout() {
+      if (currentScenario === 'threshold') {
+        if (!layersState.threshold) {
+          alert('Lớp [Ngưỡng chi tiêu] đang TẮT. Đơn hàng được thanh toán thẳng qua SPayLater mà không bị chặn!');
+          return;
+        }
+        document.getElementById('popup-threshold').classList.add('active');
+      } else if (currentScenario === 'night') {
+        if (!layersState.context) {
+          alert('Lớp [Ngữ cảnh đêm muộn] đang TẮT. Đơn hàng được thanh toán bình thường!');
+          return;
+        }
+        document.getElementById('popup-night').classList.add('active');
+      } else if (currentScenario === 'freq') {
+        if (!layersState.freq) {
+          alert('Lớp [Tần suất] đang TẮT. Bạn có thể mua bao nhiêu đơn liên tiếp tùy thích mà không bị khóa!');
+          return;
+        }
+        document.getElementById('popup-freq').classList.add('active');
+      }
+    }
+
+    function closePopup() {
+      document.querySelectorAll('.popup-overlay').forEach(p => p.classList.remove('active'));
+    }
+
+    // Khởi tạo ứng dụng
+    updateShieldUI();
+    updateDashboardAmounts();
+    renderTransactions();
+  </script>
+</body>
+</html>
